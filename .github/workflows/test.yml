@@ -6,8 +6,31 @@ on:
       - main
 
 jobs:
-  unit-test:
+  java-source:
     runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+
+        - uses: zestia/junit-results-toolkit@v1
+          with:
+            files: .github/workflows/test-data/junit.xml
+
+  jest-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: zestia/junit-results-toolkit@v1
+        with:
+          files: .github/workflows/test-data/jest.xml
+
+  unit-test:
+    if: ${{ always() }}
+    needs:
+      - java-source
+      - jest-source
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -19,3 +42,41 @@ jobs:
 
       - name: Test
         run: npm run build
+
+      - uses: ./
+        id: run-action
+
+      - name: Verify output
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const assert = require('assert').strict;
+            const data = JSON.parse('${{ steps.run-action.outputs.test-results }}');
+
+            assert.strictEqual(data.name, 'CI Test', 'project name');
+
+            // test summary
+            assert.strictEqual(data.summary.duration.toFixed(3), 2.019.toFixed(3), 'summary duration');
+            assert.strictEqual(data.summary.tests, 3, 'summary total tests');
+            assert.strictEqual(data.summary.passed, 2, 'summary passed');
+            assert.strictEqual(data.summary.failed, 1, 'summary failed');
+            assert.strictEqual(data.summary.skipped, 0, 'summary skipped');
+
+            // projects
+            assert.strictEqual(data.projects.length, 2, 'project count');
+
+            // project 0
+            assert.strictEqual(data.projects[0].name, 'java-source', 'project 0 name');
+            assert.strictEqual(data.projects[0].summary.duration, 2.017, 'project 0 duration');
+            assert.strictEqual(data.projects[0].summary.tests, 2, 'project 0 total tests');
+            assert.strictEqual(data.projects[0].summary.passed, 1, 'project 0 passed');
+            assert.strictEqual(data.projects[0].summary.failed, 1, 'project 0 failed');
+            assert.strictEqual(data.projects[0].summary.skipped, 0, 'project 0 skipped');
+
+            // project 1
+            assert.strictEqual(data.projects[1].name, 'jest-source', 'project 1 name');
+            assert.strictEqual(data.projects[1].summary.duration, 0.002, 'project 1 duration');
+            assert.strictEqual(data.projects[1].summary.tests, 1, 'project 1 total tests');
+            assert.strictEqual(data.projects[1].summary.passed, 1, 'project 1 passed');
+            assert.strictEqual(data.projects[1].summary.failed, 0, 'project 1 failed');
+            assert.strictEqual(data.projects[1].summary.skipped, 0, 'project 1 skipped');
