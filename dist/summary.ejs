@@ -1,0 +1,112 @@
+<html>
+<head>
+    <title>JUnit Summary Report</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"
+        }
+
+        .summary-field {
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        tr.total {
+            font-weight: bold;
+        }
+
+        td.count,
+        td.duration,
+        td.status {
+            width: 4em;
+            text-align: right;
+        }
+
+        td.duration {
+            width: 6em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table.projectReport.tests .suite {
+            font-family: monospace;
+        }
+
+        .status .pass {
+            color: #008b00;
+        }
+
+        .status .fail {
+            color: #8b0000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #0D1117;
+                color: #c9d1d9;
+            }
+
+            tr:nth-child(even) {
+                background-color: #242424;
+            }
+
+            a {
+                color: #58a6ff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<h1>Test Summary Report</h1>
+
+<h2 id="summary">Summary</h2>
+
+<ul>
+    <li><span class="summary-field">Job Name:</span> <%= report.name %></li>
+    <li><span class="summary-field">Start Time:</span> <%= formatDate(report.summary.startTime, datePattern) %></li>
+    <li><span class="summary-field">Total Duration:</span> <%= formatTestDuration(report.summary.duration) %></li>
+</ul>
+
+<table class="reports">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Duration</th>
+        <th>Pass</th>
+        <th>Fail</th>
+        <th>Skip</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr class="total">
+        <td>TOTAL</td>
+        <td class="duration"><%= report.summary.duration.toFixed(2) %></td>
+        <td class="count"><%= report.summary.passed %></td>
+        <td class="count"><%= report.summary.failed %></td>
+        <td class="count"><%= report.summary.skipped %></td>
+        <td class="count"><%= report.summary.tests %></td>
+    </tr>
+
+    <% report.projects.forEach(function (project) { %>
+        <tr>
+            <td class="project"><a href="<%= project.name %>-report.html" target="_blank"><%= project.name %></a></td>
+            <td class="duration"><%= project.summary.duration.toFixed(2) %></td>
+            <td class="count"><%= project.summary.passed %></td>
+            <td class="count"><%= project.summary.failed %></td>
+            <td class="count"><%= project.summary.skipped %></td>
+            <td class="count"><%= project.summary.tests %></td>
+        </tr>
+    <% }); %>
+    </tbody>
+</table>
+</body>
+</html>

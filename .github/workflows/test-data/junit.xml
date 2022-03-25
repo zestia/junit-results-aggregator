@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuite hostname="github-actions" name="com.zestia.GreeterSpec" tests="1" errors="0" failures="1" skipped="0"
+           time="2.017" timestamp="2022-03-24T10:21:10">
+    <properties>
+        <property name="java.runtime.version" value="1.8.0_322-b06"/>
+        <property name="os.arch" value="x86_64"/>
+    </properties>
+    <testcase classname="com.zestia.GreeterSpec" name="greet should greet someone" time="0.016">
+
+    </testcase>
+    <testcase classname="com.zestia.GreeterSpec" name="greet the world" time="2.001">
+        <failure message="&quot;hello, world[]&quot; was not equal to &quot;hello, world[!]&quot;"
+                 type="org.scalatest.exceptions.TestFailedException">org.scalatest.exceptions.TestFailedException:
+            &quot;hello, Bob[]&quot; was not equal to &quot;hello, Bob[!]&quot;
+            at org.scalatest.matchers.MatchersHelper$.indicateFailure(MatchersHelper.scala:392)
+            at org.scalatest.matchers.should.Matchers$AnyShouldWrapper.shouldBe(Matchers.scala:7021)
+            at software.purpledragon.GreeterSpec.$anonfun$new$1(GreeterSpec.scala:10)
+            ...
+        </failure>
+    </testcase>
+    <system-out><![CDATA[]]></system-out>
+    <system-err><![CDATA[]]></system-err>
+</testsuite>

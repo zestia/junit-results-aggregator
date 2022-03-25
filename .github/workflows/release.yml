@@ -1,0 +1,58 @@
+name: Publish Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: ${{ !env.ACT && 'npm' || '' }}
+
+      - name: Parse version tag
+        uses: booxmedialtd/ws-action-parse-semver@v1
+        id: semver-version
+        with:
+          input_string: ${{ github.ref_name }}
+          version_extractor_regex: '^v(.*)$'
+
+      - name: Update package version
+        uses: reedyuk/npm-version@1.1.1
+        with:
+          version: ${{ steps.semver-version.outputs.fullversion }}
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Build Source
+        run: npm run build
+
+      - run: find . -type f
+
+      - name: Commit changes
+        uses: swinton/commit@v2.x
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commit-message: Publish version "${{ steps.semver-version.outputs.fullversion }}'
+          files: |
+            dist/index.js
+            dist/report.ejs
+            package.json
+
+      - name: Tag release
+        run: |
+          git tag -f v${{ steps.semver-version.outputs.fullversion }}
+          git tag -f v${{ steps.semver-version.outputs.major }}
+
+      - name: Push changes
+        run: |
+          git push -f origin v${{ steps.semver-version.outputs.fullversion }}
+          git push -f origin v${{ steps.semver-version.outputs.major }}
