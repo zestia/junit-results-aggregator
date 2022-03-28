@@ -1,0 +1,22 @@
+{
+  "name": "project-2 build",
+  "summary": {
+    "startTime": 1648128401000,
+    "duration": 15.223,
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "slow test",
+      "startTime": 1648128401000,
+      "duration": 15.223,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    }
+  ]
+}

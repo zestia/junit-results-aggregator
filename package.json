@@ -5,15 +5,19 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "ncc build src/index.ts",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "test": "jest"
   },
   "author": "Michael Stringer",
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/ejs": "^3.1.0",
+    "@types/jest": "^27.4.1",
     "@types/node": "^16.11.26",
     "@vercel/ncc": "^0.33.3",
+    "jest": "^27.5.1",
     "prettier": "^2.6.1",
+    "ts-jest": "^27.1.4",
     "typescript": "^4.6.3"
   },
   "dependencies": {

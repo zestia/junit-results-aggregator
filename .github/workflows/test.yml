@@ -6,14 +6,30 @@ on:
       - main
 
 jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
   java-source:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-        - uses: zestia/junit-results-toolkit@v1
-          with:
-            files: .github/workflows/test-data/junit.xml
+      - uses: zestia/junit-results-toolkit@v1
+        with:
+          files: .github/workflows/test-data/junit.xml
 
   jest-source:
     runs-on: ubuntu-latest
@@ -24,7 +40,7 @@ jobs:
         with:
           files: .github/workflows/test-data/jest.xml
 
-  unit-test:
+  integration-test:
     if: ${{ always() }}
     needs:
       - java-source
@@ -40,7 +56,7 @@ jobs:
       - name: Install packages
         run: npm ci
 
-      - name: Test
+      - name: Build
         run: npm run build
 
       - uses: ./

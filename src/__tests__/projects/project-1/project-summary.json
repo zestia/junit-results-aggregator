@@ -1,0 +1,40 @@
+{
+  "name": "project-1 build",
+  "summary": {
+    "startTime": 1648128401000,
+    "duration": 0.032,
+    "tests": 3,
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "com.example.WidgetTest",
+      "startTime": 1648128437000,
+      "duration": 0.011,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.example.GadgetTest",
+      "startTime": 1648128437000,
+      "duration": 0.017,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.example.FlangeTest",
+      "startTime": 1648128401000,
+      "duration": 0.004,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0
+    }
+  ]
+}

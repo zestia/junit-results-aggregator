@@ -18,7 +18,7 @@ async function run() {
 
   const reportFiles = await fetchReports(tmpDir);
 
-  const aggregator = new ReportAggregator(tmpDir, github.context.workflow);
+  const aggregator = new ReportAggregator(tmpDir, github.context.workflow, true);
 
   for (const report of reportFiles) {
     await aggregator.addProject(report);

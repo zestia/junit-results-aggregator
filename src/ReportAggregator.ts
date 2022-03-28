@@ -32,12 +32,14 @@ function formatTestDuration(s: number): string {
 export class ReportAggregator {
   private readonly tmpDir: string;
   private readonly targetDir: string;
+  private readonly failOnMissingReport: boolean;
 
   private readonly output: GeneratedReport;
 
-  constructor(tmpDir: string, projectName: string) {
+  constructor(tmpDir: string, projectName: string, failOnMissingReport: boolean) {
     this.tmpDir = tmpDir;
     this.targetDir = path.join(tmpDir, 'aggregate-report');
+    this.failOnMissingReport = failOnMissingReport;
 
     this.output = {
       report: new AggregateReport(projectName),
@@ -47,19 +49,25 @@ export class ReportAggregator {
   }
 
   async addProject(name: string): Promise<void> {
+    // ensure target dir exists
     await io.mkdirP(this.targetDir);
 
     // load summary & combine add it to the summary
     const projectSummary = await this.loadProjectReport(name);
 
-    this.output.report.addReport(projectSummary);
+    if (projectSummary) {
+      this.output.report.addReport(projectSummary);
 
-    // copy html report & add to list of files
-    const projectReportFile = await this.copyProjectHtmlReport(name);
-    this.output.files.push(projectReportFile);
+      // copy html report & add to list of files
+      const projectReportFile = await this.copyProjectHtmlReport(name);
+      this.output.files.push(projectReportFile);
+    }
   }
 
   async finaliseReport(): Promise<GeneratedReport> {
+    // ensure target dir exists
+    await io.mkdirP(this.targetDir);
+
     const jsonSummary = await this.generateSummaryJson();
     const htmlSummary = await this.generateSummaryReport();
 
@@ -68,8 +76,17 @@ export class ReportAggregator {
     return this.output;
   }
 
-  private async loadProjectReport(name: string): Promise<ProjectReport> {
+  private async loadProjectReport(name: string): Promise<ProjectReport | undefined> {
     const summaryFile = await this.getReportPath(name, SUMMARY_FILENAME);
+
+    if (!summaryFile) {
+      if (this.failOnMissingReport) {
+        throw new Error(`Cannot locate report for [${name}] project`);
+      } else {
+        return;
+      }
+    }
+
     const data = await fsPromises.readFile(summaryFile, { encoding: 'utf-8' });
     return JSON.parse(data);
   }
@@ -85,15 +102,23 @@ export class ReportAggregator {
     return targetFile;
   }
 
-  private async getReportPath(projectName: string, reportName: string): Promise<string> {
+  private async getReportPath(
+    projectName: string,
+    reportName: string,
+  ): Promise<string | undefined> {
     const reportFile = path.join(this.tmpDir, projectName, reportName);
-    const reportStat = await fsPromises.stat(reportFile);
 
-    if (!reportStat.isFile()) {
-      throw new Error(`Cannot locate ${reportName} for ${projectName} project`);
+    try {
+      const reportStat = await fsPromises.stat(reportFile);
+
+      if (!reportStat.isFile()) {
+        return undefined;
+      }
+
+      return reportFile;
+    } catch (e) {
+      return undefined;
     }
-
-    return reportFile;
   }
 
   private async generateSummaryJson(): Promise<string> {
