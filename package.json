@@ -1,6 +1,6 @@
 {
   "name": "junit-results-aggregator",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "GitHub action for aggregating JUnit results",
   "main": "dist/index.js",
   "scripts": {
