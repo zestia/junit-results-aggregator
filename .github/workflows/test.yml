@@ -20,7 +20,7 @@ jobs:
         run: npm ci
 
       - name: Run Tests
-        run: npm test
+        run: npm run test:ci
 
   java-source:
     runs-on: ubuntu-latest

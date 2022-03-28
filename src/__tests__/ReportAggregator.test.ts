@@ -145,7 +145,7 @@ interface AggregatorFixture {
 
 async function createAggregator(
   projects: string[],
-  failOnMissingReport: boolean = true,
+  failOnMissingReport = true,
 ): Promise<AggregatorFixture> {
   const tmpDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'junit-results-summary-'));
 
@@ -167,5 +167,5 @@ async function matchy(expected: string, actual: string): Promise<void> {
   const e = fsPromises.readFile(expected, { encoding: 'utf-8' });
   const a = fsPromises.readFile(actual, { encoding: 'utf-8' });
 
-  expect(a).toEqual(a);
+  expect(a).toEqual(e);
 }
