@@ -39217,10 +39217,12 @@ function formatTestDuration(s) {
 class ReportAggregator {
     tmpDir;
     targetDir;
+    failOnMissingReport;
     output;
-    constructor(tmpDir, projectName) {
+    constructor(tmpDir, projectName, failOnMissingReport) {
         this.tmpDir = tmpDir;
         this.targetDir = external_path_.join(tmpDir, 'aggregate-report');
+        this.failOnMissingReport = failOnMissingReport;
         this.output = {
             report: new AggregateReport(projectName),
             basedir: this.targetDir,
@@ -39228,15 +39230,20 @@ class ReportAggregator {
         };
     }
     async addProject(name) {
+        // ensure target dir exists
         await io.mkdirP(this.targetDir);
         // load summary & combine add it to the summary
         const projectSummary = await this.loadProjectReport(name);
-        this.output.report.addReport(projectSummary);
-        // copy html report & add to list of files
-        const projectReportFile = await this.copyProjectHtmlReport(name);
-        this.output.files.push(projectReportFile);
+        if (projectSummary) {
+            this.output.report.addReport(projectSummary);
+            // copy html report & add to list of files
+            const projectReportFile = await this.copyProjectHtmlReport(name);
+            this.output.files.push(projectReportFile);
+        }
     }
     async finaliseReport() {
+        // ensure target dir exists
+        await io.mkdirP(this.targetDir);
         const jsonSummary = await this.generateSummaryJson();
         const htmlSummary = await this.generateSummaryReport();
         this.output.files.push(jsonSummary, htmlSummary);
@@ -39244,6 +39251,14 @@ class ReportAggregator {
     }
     async loadProjectReport(name) {
         const summaryFile = await this.getReportPath(name, SUMMARY_FILENAME);
+        if (!summaryFile) {
+            if (this.failOnMissingReport) {
+                throw new Error(`Cannot locate report for [${name}] project`);
+            }
+            else {
+                return;
+            }
+        }
         const data = await external_fs_.promises.readFile(summaryFile, { encoding: 'utf-8' });
         return JSON.parse(data);
     }
@@ -39255,11 +39270,16 @@ class ReportAggregator {
     }
     async getReportPath(projectName, reportName) {
         const reportFile = external_path_.join(this.tmpDir, projectName, reportName);
-        const reportStat = await external_fs_.promises.stat(reportFile);
-        if (!reportStat.isFile()) {
-            throw new Error(`Cannot locate ${reportName} for ${projectName} project`);
+        try {
+            const reportStat = await external_fs_.promises.stat(reportFile);
+            if (!reportStat.isFile()) {
+                return undefined;
+            }
+            return reportFile;
         }
-        return reportFile;
+        catch (e) {
+            return undefined;
+        }
     }
     async generateSummaryJson() {
         const summaryFile = external_path_.join(this.targetDir, SUMMARY_FILENAME);
@@ -39290,28 +39310,29 @@ class ReportAggregator {
 const REPORT_PREFIX = 'test-report-';
 const ARTIFACT_CLIENT = artifact_client/* create */.U();
 async function run() {
+    const uploadReport = core.getBooleanInput('upload-report');
+    const artifactName = core.getInput('artifact-name');
     const retentionDays = getNumberInput('retention-days');
-    // TODO name override
     const tmpDir = await external_fs_.promises.mkdtemp(external_path_.join(external_os_.tmpdir(), 'junit-results-summary-'));
     const reportFiles = await fetchReports(tmpDir);
-    const aggregator = new ReportAggregator(tmpDir, github.context.workflow);
+    const aggregator = new ReportAggregator(tmpDir, github.context.workflow, true);
     for (const report of reportFiles) {
         await aggregator.addProject(report);
     }
     const aggregatedReport = await aggregator.finaliseReport();
     core.setOutput('test-results', aggregatedReport.report);
-    await uploadReports(aggregatedReport, retentionDays);
+    if (uploadReport) {
+        const targetName = artifactName ? artifactName : 'summary-test-report';
+        await ARTIFACT_CLIENT.uploadArtifact(targetName, aggregatedReport.files, aggregatedReport.basedir, {
+            retentionDays,
+        });
+    }
 }
 async function fetchReports(tmpDir) {
     const artifacts = await ARTIFACT_CLIENT.downloadAllArtifacts(tmpDir);
     return artifacts
         .map((artifact) => artifact.artifactName)
         .filter((name) => name.startsWith(REPORT_PREFIX));
-}
-async function uploadReports(report, retentionDays) {
-    await ARTIFACT_CLIENT.uploadArtifact('summary-test-report', report.files, report.basedir, {
-        retentionDays,
-    });
 }
 function getNumberInput(key) {
     const raw = core.getInput(key);
