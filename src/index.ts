@@ -4,15 +4,16 @@ import { promises as fsPromises } from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as artifact from '@actions/artifact';
-import { GeneratedReport, ReportAggregator } from './ReportAggregator';
+import { ReportAggregator } from './ReportAggregator';
 
 const REPORT_PREFIX = 'test-report-';
 
 const ARTIFACT_CLIENT = artifact.create();
 
 async function run() {
+  const uploadReport = core.getBooleanInput('upload-report');
+  const artifactName = core.getInput('artifact-name');
   const retentionDays = getNumberInput('retention-days');
-  // TODO name override
 
   const tmpDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'junit-results-summary-'));
 
@@ -27,7 +28,18 @@ async function run() {
   const aggregatedReport = await aggregator.finaliseReport();
   core.setOutput('test-results', aggregatedReport.report);
 
-  await uploadReports(aggregatedReport, retentionDays);
+  if (uploadReport) {
+    const targetName = artifactName ? artifactName : 'summary-test-report';
+
+    await ARTIFACT_CLIENT.uploadArtifact(
+      targetName,
+      aggregatedReport.files,
+      aggregatedReport.basedir,
+      {
+        retentionDays,
+      },
+    );
+  }
 }
 
 async function fetchReports(tmpDir: string): Promise<string[]> {
@@ -36,15 +48,6 @@ async function fetchReports(tmpDir: string): Promise<string[]> {
   return artifacts
     .map((artifact) => artifact.artifactName)
     .filter((name) => name.startsWith(REPORT_PREFIX));
-}
-
-async function uploadReports(
-  report: GeneratedReport,
-  retentionDays: number | undefined,
-): Promise<void> {
-  await ARTIFACT_CLIENT.uploadArtifact('summary-test-report', report.files, report.basedir, {
-    retentionDays,
-  });
 }
 
 function getNumberInput(key: string): number | undefined {

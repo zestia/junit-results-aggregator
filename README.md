@@ -71,9 +71,11 @@ A new artifact called `summary-test-report` will be created containing the follo
 
 ## Options
 
-| Name             | Description                                   | Default                               |
-|------------------|-----------------------------------------------|---------------------------------------|
-| `retention-days` | Number of days to retain the report artifact. | Repository default (usually 90 days). |
+| Name             | Description                                                                     | Default                               |
+| ---------------- | ------------------------------------------------------------------------------- | ------------------------------------- |
+| `retention-days` | Number of days to retain the report artifact.                                   | Repository default (usually 90 days). |
+| `upload-report`  | If `true` then an HTML report will be generated & uploaded to `$artifact-name`. | `true`                                |
+| `artifact-name`  | Name of the artifact to use when uploading HTML report.                         | `summary-test-report`                 |
 
 ## Outputs
 
