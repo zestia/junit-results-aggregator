@@ -122,7 +122,11 @@ describe('ReportAggregator', () => {
     try {
       await aggregator.addProject('unknown');
     } catch (e) {
-      expect(e.message).toBe('Cannot locate report for [unknown] project');
+      if (e instanceof Error) {
+        expect(e.message).toBe('Cannot locate report for [unknown] project');
+      } else {
+        fail('Unexpected error type');
+      }
     }
   });
 
