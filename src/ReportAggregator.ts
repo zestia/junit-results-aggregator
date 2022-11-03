@@ -60,7 +60,10 @@ export class ReportAggregator {
 
       // copy html report & add to list of files
       const projectReportFile = await this.copyProjectHtmlReport(name);
-      this.output.files.push(projectReportFile);
+
+      if (projectReportFile) {
+        this.output.files.push(projectReportFile);
+      }
     }
   }
 
@@ -91,15 +94,18 @@ export class ReportAggregator {
     return JSON.parse(data);
   }
 
-  private async copyProjectHtmlReport(name: string): Promise<string> {
+  private async copyProjectHtmlReport(name: string): Promise<string | undefined> {
     const reportFile = await this.getReportPath(name, HTML_FILENAME);
-    const targetFile = path.join(
-      this.targetDir,
-      `${name.replace(/^test-report-/, '')}-report.html`,
-    );
 
-    await io.cp(reportFile, targetFile);
-    return targetFile;
+    if (reportFile) {
+      const targetFile = path.join(
+        this.targetDir,
+        `${name.replace(/^test-report-/, '')}-report.html`,
+      );
+
+      await io.cp(reportFile, targetFile);
+      return targetFile;
+    }
   }
 
   private async getReportPath(
