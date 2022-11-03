@@ -10,11 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 16
 
       - name: Install packages
         run: npm ci
@@ -25,7 +24,7 @@ jobs:
   java-source:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: zestia/junit-results-toolkit@v1
         with:
@@ -34,7 +33,7 @@ jobs:
   jest-source:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: zestia/junit-results-toolkit@v1
         with:
@@ -48,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 16
 
       - name: Install packages
         run: npm ci
@@ -63,7 +62,7 @@ jobs:
         id: run-action
 
       - name: Verify output
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           script: |
             const assert = require('assert').strict;
