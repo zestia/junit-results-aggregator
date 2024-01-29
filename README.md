@@ -15,7 +15,7 @@ jobs:
     steps:
       # ... test steps omitted ...
       - name: Parse Test Results
-        uses: zestia/junit-results-toolkit@v1
+        uses: zestia/junit-results-toolkit@v2
         id: test-results
         if: ${{ always() }}
         with:
@@ -24,7 +24,7 @@ jobs:
   jest-build:
     # ... test steps omitted ...
     - name: Parse Test Results
-      uses: zestia/junit-results-toolkit@v1
+      uses: zestia/junit-results-toolkit@v2
       id: test-results
       if: ${{ always() }}
       with:
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: zestia/junit-results-aggregator@v1
+      - uses: zestia/junit-results-aggregator@v2
         id: test-results
 
       - name: Echo Aggregate Results
