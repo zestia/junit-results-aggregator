@@ -28,18 +28,25 @@ jobs:
         with:
           version: ${{ steps.semver-version.outputs.fullversion }}
 
+      - name: Clean previous version
+        run: git rm -r dist
+
       - name: Install packages
         run: npm ci
 
       - name: Build Source
         run: npm run build
 
-      - run: find . -type f
+      - name: Fix templates
+        run: |
+          mkdir -p dist/templates
+          cp src/templates/* dist/templates
 
       - name: Commit changes
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
+          git add dist
           git commit -a -m "Release ${{ steps.semver-version.outputs.fullversion }}"
 
       - name: Tag release

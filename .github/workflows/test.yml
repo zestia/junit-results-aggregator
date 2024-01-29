@@ -55,11 +55,20 @@ jobs:
       - name: Install packages
         run: npm ci
 
+      - name: Clean previous version
+        run: rm -r dist
+
       - name: Build
         run: npm run build
 
-      - uses: ./
+      - name: Run action
+        uses: ./
         id: run-action
+
+      - name: Fix templates
+        run: |
+          mkdir -p dist/templates
+          cp src/templates/* dist/templates
 
       - name: Verify output
         uses: actions/github-script@v7
