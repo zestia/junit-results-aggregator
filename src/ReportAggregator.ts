@@ -93,6 +93,11 @@ export class ReportAggregator {
 
   private async copyProjectHtmlReport(name: string): Promise<string> {
     const reportFile = await this.getReportPath(name, HTML_FILENAME);
+
+    if (!reportFile) {
+      throw new Error(`Could not find project HTML report ${name}`);
+    }
+
     const targetFile = path.join(
       this.targetDir,
       `${name.replace(/^test-report-/, '')}-report.html`,
