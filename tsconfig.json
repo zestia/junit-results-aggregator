@@ -1,7 +1,7 @@
 {
+  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "moduleResolution": "node",
     "esModuleInterop": true
   },
   "include": ["src"]
