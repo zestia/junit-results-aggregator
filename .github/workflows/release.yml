@@ -10,21 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
           cache: ${{ !env.ACT && 'npm' || '' }}
 
       - name: Parse version tag
-        uses: booxmedialtd/ws-action-parse-semver@v1
+        uses: booxmedialtd/ws-action-parse-semver@v1.4.7
         id: semver-version
         with:
           input_string: ${{ github.ref_name }}
           version_extractor_regex: '^v(.*)$'
 
       - name: Update package version
-        uses: reedyuk/npm-version@1.1.1
+        uses: reedyuk/npm-version@1.2.2
         with:
           version: ${{ steps.semver-version.outputs.fullversion }}
 
@@ -37,15 +37,10 @@ jobs:
       - run: find . -type f
 
       - name: Commit changes
-        uses: swinton/commit@v2.x
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          commit-message: Publish version "${{ steps.semver-version.outputs.fullversion }}'
-          files: |
-            dist/index.js
-            dist/summary.ejs
-            package.json
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git commit -a -m "Release ${{ steps.semver-version.outputs.fullversion }}"
 
       - name: Tag release
         run: |
