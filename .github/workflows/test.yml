@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: zestia/junit-results-toolkit@v2
+      - uses: zestia/junit-results-toolkit@v3
         with:
           files: .github/workflows/test-data/junit.xml
 
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: zestia/junit-results-toolkit@v2
+      - uses: zestia/junit-results-toolkit@v3
         with:
           files: .github/workflows/test-data/jest.xml
 
