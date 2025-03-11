@@ -50,8 +50,9 @@ async function fetchReports(tmpDir: string): Promise<string[]> {
   const downloadedArtifacts = artifacts.artifacts
     .filter((artifact) => artifact.name.startsWith(REPORT_PREFIX))
     .map(async (artifact) => {
-      await ARTIFACT_CLIENT.downloadArtifact(artifact.id, { path: tmpDir });
-      return artifact.name;
+      const dest = path.join(tmpDir, artifact.name);
+      await ARTIFACT_CLIENT.downloadArtifact(artifact.id, { path: dest });
+      return dest;
     });
 
   return Promise.all(downloadedArtifacts);

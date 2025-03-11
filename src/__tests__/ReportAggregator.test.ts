@@ -39,9 +39,9 @@ describe('ReportAggregator', () => {
   });
 
   test('should parse project and add to output', async () => {
-    const { aggregator } = await createAggregator(['project-1']);
+    const { tmpDir, aggregator } = await createAggregator(['project-1']);
 
-    await aggregator.addProject('project-1');
+    await aggregator.addProject(path.join(tmpDir, 'project-1'));
     const report = await aggregator.finaliseReport();
 
     // summary
@@ -86,10 +86,10 @@ describe('ReportAggregator', () => {
   });
 
   test('combine 2 reports', async () => {
-    const { aggregator } = await createAggregator(['project-1', 'project-2']);
+    const { tmpDir, aggregator } = await createAggregator(['project-1', 'project-2']);
 
-    await aggregator.addProject('project-1');
-    await aggregator.addProject('project-2');
+    await aggregator.addProject(path.join(tmpDir, 'project-1'));
+    await aggregator.addProject(path.join(tmpDir, 'project-2'));
     const report = await aggregator.finaliseReport();
 
     // summary
@@ -117,13 +117,13 @@ describe('ReportAggregator', () => {
   });
 
   test('should throw error when adding unknown project', async () => {
-    const { aggregator } = await createAggregator([]);
+    const { tmpDir, aggregator } = await createAggregator([]);
 
     try {
-      await aggregator.addProject('unknown');
+      await aggregator.addProject(path.join(tmpDir, 'unknown'));
     } catch (e) {
       if (e instanceof Error) {
-        expect(e.message).toBe('Cannot locate report for [unknown] project');
+        expect(e.message).toMatch(/Cannot locate report for \[.*\/unknown] project/);
       } else {
         fail(`unexpected error type: ${typeof e}`);
       }
@@ -131,10 +131,10 @@ describe('ReportAggregator', () => {
   });
 
   test("should not throw error on unknown project if 'failOnMissingReport' is false", async () => {
-    const { aggregator } = await createAggregator([], false);
+    const { tmpDir, aggregator } = await createAggregator([], false);
 
     // add project
-    await aggregator.addProject('unknown');
+    await aggregator.addProject(path.join(tmpDir, 'unknown'));
 
     // report should still be empty
     const report = await aggregator.finaliseReport();
