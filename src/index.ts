@@ -3,12 +3,12 @@ import * as github from '@actions/github';
 import { promises as fsPromises } from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import * as artifact from '@actions/artifact';
+import { DefaultArtifactClient } from '@actions/artifact';
 import { ReportAggregator } from './ReportAggregator';
 
 const REPORT_PREFIX = 'test-report-';
 
-const ARTIFACT_CLIENT = artifact.create();
+const ARTIFACT_CLIENT = new DefaultArtifactClient();
 
 async function run() {
   const uploadReport = core.getBooleanInput('upload-report');
@@ -43,11 +43,19 @@ async function run() {
 }
 
 async function fetchReports(tmpDir: string): Promise<string[]> {
-  const artifacts = await ARTIFACT_CLIENT.downloadAllArtifacts(tmpDir);
+  // list all artifacts for this build
+  const artifacts = await ARTIFACT_CLIENT.listArtifacts({ latest: true });
 
-  return artifacts
-    .map((artifact) => artifact.artifactName)
-    .filter((name) => name.startsWith(REPORT_PREFIX));
+  // download the files to the temp dir
+  const downloadedArtifacts = artifacts.artifacts
+    .filter((artifact) => artifact.name.startsWith(REPORT_PREFIX))
+    .map(async (artifact) => {
+      const dest = path.join(tmpDir, artifact.name);
+      await ARTIFACT_CLIENT.downloadArtifact(artifact.id, { path: dest });
+      return dest;
+    });
+
+  return Promise.all(downloadedArtifacts);
 }
 
 function getNumberInput(key: string): number | undefined {

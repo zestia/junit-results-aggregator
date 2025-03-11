@@ -2,7 +2,7 @@
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
-  "include": ["src"],
+  "include": ["src"]
 }

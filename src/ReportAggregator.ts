@@ -48,18 +48,18 @@ export class ReportAggregator {
     };
   }
 
-  async addProject(name: string): Promise<void> {
+  async addProject(path: string): Promise<void> {
     // ensure target dir exists
     await io.mkdirP(this.targetDir);
 
     // load summary & combine add it to the summary
-    const projectSummary = await this.loadProjectReport(name);
+    const projectSummary = await this.loadProjectReport(path);
 
     if (projectSummary) {
       this.output.report.addReport(projectSummary);
 
       // copy html report & add to list of files
-      const projectReportFile = await this.copyProjectHtmlReport(name);
+      const projectReportFile = await this.copyProjectHtmlReport(path);
       this.output.files.push(projectReportFile);
     }
   }
@@ -76,12 +76,12 @@ export class ReportAggregator {
     return this.output;
   }
 
-  private async loadProjectReport(name: string): Promise<ProjectReport | undefined> {
-    const summaryFile = await this.getReportPath(name, SUMMARY_FILENAME);
+  private async loadProjectReport(projectPath: string): Promise<ProjectReport | undefined> {
+    const summaryFile = await this.getReportPath(projectPath, SUMMARY_FILENAME);
 
     if (!summaryFile) {
       if (this.failOnMissingReport) {
-        throw new Error(`Cannot locate report for [${name}] project`);
+        throw new Error(`Cannot locate report for [${projectPath}] project`);
       } else {
         return;
       }
@@ -91,27 +91,24 @@ export class ReportAggregator {
     return JSON.parse(data);
   }
 
-  private async copyProjectHtmlReport(name: string): Promise<string> {
-    const reportFile = await this.getReportPath(name, HTML_FILENAME);
+  private async copyProjectHtmlReport(projectPath: string): Promise<string> {
+    const reportFile = await this.getReportPath(projectPath, HTML_FILENAME);
 
     if (!reportFile) {
-      throw new Error(`Could not find project HTML report ${name}`);
+      throw new Error(`Could not find project HTML report ${projectPath}`);
     }
 
-    const targetFile = path.join(
-      this.targetDir,
-      `${name.replace(/^test-report-/, '')}-report.html`,
-    );
+    const targetFile = path.join(this.targetDir, `${path.parse(projectPath).name}-report.html`);
 
     await io.cp(reportFile, targetFile);
     return targetFile;
   }
 
   private async getReportPath(
-    projectName: string,
+    projectPath: string,
     reportName: string,
   ): Promise<string | undefined> {
-    const reportFile = path.join(this.tmpDir, projectName, reportName);
+    const reportFile = path.join(projectPath, reportName);
 
     try {
       const reportStat = await fsPromises.stat(reportFile);
