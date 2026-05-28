@@ -8,12 +8,13 @@
   "type": "module",
   "scripts": {
     "build": "npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-    "prettier": "prettier --write .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest",
-    "test:ci": "npm-run-all test lint",
-    "lint": "npm-run-all lint:js lint:prettier",
+    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\" --prefixColors auto --kill-others-on-fail --timings",
     "lint:js": "eslint .",
-    "lint:prettier": "prettier --check ."
+    "lint:js:fix": "eslint --fix .",
+    "lint:format": "prettier --check .",
+    "lint:format:fix": "prettier --write .",
+    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest",
+    "test:ci": "npm-run-all test lint"
   },
   "author": "Michael Stringer",
   "license": "Apache-2.0",
@@ -36,6 +37,7 @@
     "@types/ejs": "^3.1.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.9.1",
+    "concurrently": "^10.0.0",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jest": "^29.15.2",
