@@ -57,9 +57,6 @@ jobs:
       - name: Install packages
         run: npm ci
 
-      - name: Clean previous version
-        run: rm -r dist
-
       - name: Build
         run: npm run build
 
