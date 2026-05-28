@@ -1,6 +1,9 @@
 name: JUnit Results Aggregator
 description: Aggregator for JUnit reports
 author: Michael Stringer
+branding:
+  icon: layers
+  color: blue
 
 inputs:
   upload-report:
@@ -15,5 +18,5 @@ inputs:
     required: false
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js

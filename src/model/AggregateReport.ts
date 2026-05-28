@@ -1,5 +1,5 @@
-import { TestSummary } from './TestSummary';
-import { ProjectReport } from './ProjectReport';
+import { TestSummary } from './TestSummary.js';
+import { ProjectReport } from './ProjectReport.js';
 import { isBefore } from 'date-fns';
 
 export class AggregateReport {
