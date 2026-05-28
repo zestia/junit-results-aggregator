@@ -15,7 +15,7 @@ jobs:
     steps:
       # ... test steps omitted ...
       - name: Parse Test Results
-        uses: zestia/junit-results-toolkit@v2
+        uses: zestia/junit-results-toolkit@v6
         id: test-results
         if: ${{ always() }}
         with:
@@ -24,7 +24,7 @@ jobs:
   jest-build:
     # ... test steps omitted ...
     - name: Parse Test Results
-      uses: zestia/junit-results-toolkit@v2
+      uses: zestia/junit-results-toolkit@v3
       id: test-results
       if: ${{ always() }}
       with:
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: zestia/junit-results-aggregator@v2
+      - uses: zestia/junit-results-aggregator@v3
         id: test-results
 
       - name: Echo Aggregate Results
@@ -72,7 +72,7 @@ A new artifact called `summary-test-report` will be created containing the follo
 ## Options
 
 | Name             | Description                                                                     | Default                               |
-| ---------------- | ------------------------------------------------------------------------------- | ------------------------------------- |
+|------------------|---------------------------------------------------------------------------------|---------------------------------------|
 | `retention-days` | Number of days to retain the report artifact.                                   | Repository default (usually 90 days). |
 | `upload-report`  | If `true` then an HTML report will be generated & uploaded to `$artifact-name`. | `true`                                |
 | `artifact-name`  | Name of the artifact to use when uploading HTML report.                         | `summary-test-report`                 |
