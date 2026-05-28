@@ -1,4 +1,4 @@
-import { TestSummary } from './TestSummary';
+import { TestSummary } from './TestSummary.js';
 
 export interface ProjectReport {
   name: string;

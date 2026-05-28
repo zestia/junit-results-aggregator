@@ -1,10 +1,12 @@
 import * as io from '@actions/io';
 import * as path from 'path';
-import { ProjectReport } from './model/ProjectReport';
+import { ProjectReport } from './model/ProjectReport.js';
 import { promises as fsPromises } from 'fs';
 import { format, formatDuration, intervalToDuration } from 'date-fns';
-import * as ejs from 'ejs';
-import { AggregateReport } from './model/AggregateReport';
+import ejs from 'ejs';
+import { AggregateReport } from './model/AggregateReport.js';
+
+const __dirname = import.meta.dirname;
 
 const SUMMARY_FILENAME = 'project-summary.json';
 const HTML_FILENAME = 'test-report.html';
@@ -30,14 +32,12 @@ function formatTestDuration(s: number): string {
 }
 
 export class ReportAggregator {
-  private readonly tmpDir: string;
   private readonly targetDir: string;
   private readonly failOnMissingReport: boolean;
 
   private readonly output: GeneratedReport;
 
   constructor(tmpDir: string, projectName: string, failOnMissingReport: boolean) {
-    this.tmpDir = tmpDir;
     this.targetDir = path.join(tmpDir, 'aggregate-report');
     this.failOnMissingReport = failOnMissingReport;
 
@@ -118,7 +118,7 @@ export class ReportAggregator {
       }
 
       return reportFile;
-    } catch (e) {
+    } catch (_ignored) {
       return undefined;
     }
   }

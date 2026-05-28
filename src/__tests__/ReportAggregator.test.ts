@@ -1,9 +1,12 @@
-import { ReportAggregator } from '../ReportAggregator';
+import { ReportAggregator } from '../ReportAggregator.js';
 import { promises as fsPromises } from 'fs';
 import path from 'path';
 import os from 'os';
 import * as fs from 'fs';
 import * as io from '@actions/io';
+import { expect, describe, test } from '@jest/globals';
+
+const __dirname = import.meta.dirname;
 
 describe('ReportAggregator', () => {
   test('generate for empty project', async () => {
@@ -119,15 +122,9 @@ describe('ReportAggregator', () => {
   test('should throw error when adding unknown project', async () => {
     const { tmpDir, aggregator } = await createAggregator([]);
 
-    try {
-      await aggregator.addProject(path.join(tmpDir, 'unknown'));
-    } catch (e) {
-      if (e instanceof Error) {
-        expect(e.message).toMatch(/Cannot locate report for \[.*\/unknown] project/);
-      } else {
-        fail(`unexpected error type: ${typeof e}`);
-      }
-    }
+    await expect(aggregator.addProject(path.join(tmpDir, 'unknown'))).rejects.toThrow(
+      /Cannot locate report for \[.*\/unknown] project/,
+    );
   });
 
   test("should not throw error on unknown project if 'failOnMissingReport' is false", async () => {

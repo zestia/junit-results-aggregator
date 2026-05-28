@@ -4,7 +4,7 @@ import { promises as fsPromises } from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { DefaultArtifactClient } from '@actions/artifact';
-import { ReportAggregator } from './ReportAggregator';
+import { ReportAggregator } from './ReportAggregator.js';
 
 const REPORT_PREFIX = 'test-report-';
 
